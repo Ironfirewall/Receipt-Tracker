@@ -1,0 +1,101 @@
+<%- include("partials/header"); -%>
+
+<script>
+
+  //Filters through the table using jquery
+$(document).ready(function(){
+  $("#myInput").on("keyup", function() {
+    var value = $(this).val().toLowerCase();
+    $("#myTable tr").filter(function() {
+      $(this).toggle($(this).text().toLowerCase().indexOf(value) > -1);
+    });
+  });
+});
+
+
+//if one checkbox is checked, the select button changes to "Deselect"
+function toggleSelect(){
+  if(document.getElementById("select").innerHTML==="Select All"){
+    for(let x=0; x<document.getElementsByName("check").length; x++){
+      document.getElementsByName("check")[x].checked=true;
+    }
+    document.getElementById("select").innerHTML = "Deselect  ";
+  } else {
+    for(let x=0; x<document.getElementsByName("check").length; x++){
+      document.getElementsByName("check")[x].checked=false;
+    }
+    document.getElementById("select").innerHTML="Select All";
+  }
+
+}
+// if any checkbox is checked, the "Select all" button will be changed to "Deselect"
+function detectCheck(){
+  document.getElementById("select").innerHTML = "Deselect  ";
+}
+
+//if the button "Select all" is unchanged, no data will be posted to the server for the remove route. Otherwise an array of checked items will be send to the server
+function triggerRemove(){
+  if(document.getElementById("select").innerHTML==="Deselect  "){
+    document.getElementsByName('checkedItems')[0].submit();
+  }
+}
+
+//if the button "Select all" is unchanged, no data will be posted to the server for the modify route. Otherwise an array of checked items will be send to the server
+function triggerModify(){
+  if(document.getElementById("select").innerHTML==="Deselect  "){
+    document.getElementsByName('checkedItems')[0].submit();
+  }
+}
+</script>
+
+
+<!-- <form class="" action="/remove" method="post" name="checkedItems"> -->
+<button class="btn select-all btn-primary" id="select" onclick='toggleSelect()'>Select All</button>
+<input type="text" name="" value="" placeholder="Search for any item..." id="myInput">
+<button type="button" class="btn main-page-button btn-primary" onclick="window.location.href = '/add';">Add an item</button>
+<!-- <button class="btn main-page-button btn-primary" onclick="window.location.href = '/remove';">Remove Selected Items</button> -->
+
+
+<button class="btn main-page-button btn-primary" onclick="triggerRemove()">Remove Selected Items</button>
+<button class="btn main-page-button btn-primary" onclick="triggerModify()">Modify Selected Items</button>
+<!-- formaction="/modify" -->
+  <div class="tableFixHead">
+
+    <table class="main-table">
+      <thead>
+        <tr>
+          <th class="checkbox-width">Select</th>
+          <th>Date (Y/M/D)</th>
+          <th>Store Name</th>
+          <th>Store Address</th>
+          <th>Item Name</th>
+          <th>Item Quantity</th>
+          <th>Price</th>
+        </tr>
+      </thead>
+      <tbody id="myTable">
+        <form class="" action="/remove" method="post" name="checkedItems">
+        <% receiptList.reverse().forEach(function(receipt){ %>
+          <!-- <form class="" action="/remove" method="post" id="checkedItems"> -->
+            <tr>
+              <td class="checkbox-width"><input type="checkbox" name="check" value="<%=receipt._id%>" onclick="detectCheck()"></td>
+              <td><%= receipt.date %></td>
+              <td><%= receipt.storeName %></td>
+              <td><%= receipt.storeAddress %></td>
+              <td><%= receipt.itemName %></td>
+              <td><%= receipt.itemQuantity %></td>
+              <td><%= receipt.price %></td>
+            </tr>
+          <!-- </form> -->
+        <% }); %>
+          </form>
+      </tbody>
+    </table>
+  </div>
+  <!-- </form> -->
+  <button class="btn returnButton btn-primary" onclick="window.location.href = '/add';">Add an item</button>
+  <br>
+  <button class="btn returnButton btn-primary" onclick="window.location.href = '/remove';">Remove Items</button>
+
+
+<%- include("partials/footer"); -%>
