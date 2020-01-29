@@ -44,6 +44,7 @@ app.get("/", function(req, res) {
   });
 });
 
+
 app.get("/add", function(req, res) {
   res.render("add");
 });
@@ -97,9 +98,27 @@ app.post("/remove", function(req, res) {
   res.redirect("/");
 });
 
-app.get("/modify", function(req, res){
+app.get("/modify", function(req, res) {
   console.log("Code comes here");
   res.render("modify");
+});
+
+app.post("/modify", function(req, res) {
+  if (typeof(req.body.check) === "string") {
+    const oneItemId = req.body.check;
+    res.render("modify", {
+      itemId: oneItemId
+    });
+  } else if (typeof(req.body.check) === "object") {
+    const arrayItemId = req.body.check;
+    res.render("modify", {
+      itemId: arrayItemId
+    });
+  } else {
+    res.redirect("/");
+  }
+  console.log(req.body);
+  // res.render("modify");
 });
 
 app.listen(3000, function() {

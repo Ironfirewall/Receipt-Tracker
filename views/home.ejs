@@ -1,6 +1,7 @@
 <%- include("partials/header"); -%>
 
 <script>
+  let listOfClickedCheckboxes = [];
 
   //Filters through the table using jquery
 $(document).ready(function(){
@@ -24,14 +25,29 @@ function toggleSelect(){
     for(let x=0; x<document.getElementsByName("check").length; x++){
       document.getElementsByName("check")[x].checked=false;
     }
+    listOfClickedCheckboxes = [];
     document.getElementById("select").innerHTML="Select All";
   }
 
 }
 // if any checkbox is checked, the "Select all" button will be changed to "Deselect"
-function detectCheck(){
-  document.getElementById("select").innerHTML = "Deselect  ";
+function detectCheck(checkId){
+  console.log(checkId);
+  console.log(listOfClickedCheckboxes);
+  if(listOfClickedCheckboxes.includes(checkId)){
+    listOfClickedCheckboxes = listOfClickedCheckboxes.filter(element => element != checkId);
+  }else{
+    listOfClickedCheckboxes.push(checkId);
+  }
+document.getElementById("select").innerHTML = "Deselect  ";
+  if(listOfClickedCheckboxes.length===0){
+    document.getElementById("select").innerHTML = "Select All";
+  }
+
+
 }
+
+
 
 //if the button "Select all" is unchanged, no data will be posted to the server for the remove route. Otherwise an array of checked items will be send to the server
 function triggerRemove(){
@@ -49,15 +65,15 @@ function triggerModify(){
 </script>
 
 
-<!-- <form class="" action="/remove" method="post" name="checkedItems"> -->
-<button class="btn select-all btn-primary" id="select" onclick='toggleSelect()'>Select All</button>
+<form class="" action="" method="post" name="checkedItems">
+<button type="button" class="btn select-all btn-primary" id="select" onclick='toggleSelect()'>Select All</button>
 <input type="text" name="" value="" placeholder="Search for any item..." id="myInput">
 <button type="button" class="btn main-page-button btn-primary" onclick="window.location.href = '/add';">Add an item</button>
 <!-- <button class="btn main-page-button btn-primary" onclick="window.location.href = '/remove';">Remove Selected Items</button> -->
 
-
-<button class="btn main-page-button btn-primary" onclick="triggerRemove()">Remove Selected Items</button>
-<button class="btn main-page-button btn-primary" onclick="triggerModify()">Modify Selected Items</button>
+<!-- <form class="" action="" method="post" id="checkedItems"> -->
+<button class="btn main-page-button btn-primary" formaction="/remove" onclick="triggerRemove()">Remove Selected Items</button>
+<button class="btn main-page-button btn-primary" formaction="/modify" onclick="triggerModify()">Modify Selected Items</button>
 <!-- formaction="/modify" -->
   <div class="tableFixHead">
 
@@ -65,7 +81,7 @@ function triggerModify(){
       <thead>
         <tr>
           <th class="checkbox-width">Select</th>
-          <th>Date (Y/M/D)</th>
+          <th>Date (Y-M-D)</th>
           <th>Store Name</th>
           <th>Store Address</th>
           <th>Item Name</th>
@@ -74,11 +90,11 @@ function triggerModify(){
         </tr>
       </thead>
       <tbody id="myTable">
-        <form class="" action="/remove" method="post" name="checkedItems">
+        <!-- <form class="" action="/remove" method="post" name="checkedItems"> -->
         <% receiptList.reverse().forEach(function(receipt){ %>
-          <!-- <form class="" action="/remove" method="post" id="checkedItems"> -->
+          <!-- <form class="" action="" method="post" id="checkedItems"> -->
             <tr>
-              <td class="checkbox-width"><input type="checkbox" name="check" value="<%=receipt._id%>" onclick="detectCheck()"></td>
+              <td class="checkbox-width"><input type="checkbox" name="check" value="<%=receipt._id%>" onclick="detectCheck('<%=receipt._id%>')"></td>
               <td><%= receipt.date %></td>
               <td><%= receipt.storeName %></td>
               <td><%= receipt.storeAddress %></td>
