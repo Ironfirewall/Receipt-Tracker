@@ -106,19 +106,47 @@ app.get("/modify", function(req, res) {
 app.post("/modify", function(req, res) {
   if (typeof(req.body.check) === "string") {
     const oneItemId = req.body.check;
-    res.render("modify", {
-      itemId: oneItemId
+    Receipt.findById(oneItemId, function(err, item){
+      if(err){
+        console.log(err);
+      }else{
+        console.log("The item by id is : " + item);
+        res.render("modify", {
+          receiptList: [item]
+        });
+      }
     });
+    // res.render("modify", {
+    //   itemId: oneItemId
+    // });
   } else if (typeof(req.body.check) === "object") {
     const arrayItemId = req.body.check;
-    res.render("modify", {
-      itemId: arrayItemId
+
+    console.log(arrayItemId);
+
+    Receipt.find().where('_id').in(arrayItemId).exec(function(err, fullList){
+      if(err){
+        console.log(err);
+      } else {
+        res.render("modify", {
+          receiptList: fullList
+        });
+      }
     });
+
+    // res.render("modify", {
+    //   receiptList: arrayItemId
+    // });
   } else {
     res.redirect("/");
   }
-  console.log(req.body);
+  // console.log(req.body);
   // res.render("modify");
+});
+
+app.post("/submitModified", function(req, res){
+  console.log(req.body);
+  res.redirect("/");
 });
 
 app.listen(3000, function() {

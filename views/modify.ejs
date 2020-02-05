@@ -3,9 +3,46 @@
 <div class="main-input">
   <h1>Here we can modify items</h1>
 </div>
-<button class="btn returnButton btn-primary" type="button" onclick="window.location.href = '/';">Return Home</button>
-<p>
-  <%= itemId %>
-  </p>
+
+
+<form class="" action="/submitModified" method="post" name="checkedItems">
+
+  <button class="btn returnButton btn-primary" type="button" onclick="window.location.href = '/';">Return Home</button>
+
+  <button class="btn add-button btn-primary" type="submit" name="button">Submit Changes</button>
+
+  <div class="tableFixHead">
+
+    <table class="main-table">
+      <thead>
+        <tr>
+          <th class="checkbox-width">Select</th>
+          <th>Date (Y-M-D)</th>
+          <th>Store Name</th>
+          <th>Store Address</th>
+          <th>Item Name</th>
+          <th>Item Quantity</th>
+          <th>Price</th>
+        </tr>
+      </thead>
+      <tbody id="myTable">
+        <!-- <form class="" action="/remove" method="post" name="checkedItems"> -->
+        <% receiptList.reverse().forEach(function(receipt){ %>
+        <!-- <form class="" action="" method="post" id="checkedItems"> -->
+        <tr>
+          <td><input type="date" name="updatedDate" value="<%= receipt.date %>"></td>
+          <td><input type="text" name="updatedStoreName" value="<%= receipt.storeName %>"></td>
+          <td><input type="text" name="updatedStoreAddress" value="<%= receipt.storeAddress %>"></td>
+          <td><input type="text" name="updatedItem" value="<%= receipt.itemName %>"></td>
+          <td><input type="text" name="updatedQuantity" value="<%= receipt.itemQuantity %>"></td>
+          <td><input type="text" name="updatedPrice" value="<%= receipt.price %>"></td>
+        </tr>
+        <!-- </form> -->
+        <% }); %>
+        <!-- </form> -->
+      </tbody>
+    </table>
+  </div>
+</form>
 
 <%- include("partials/footer"); -%>
