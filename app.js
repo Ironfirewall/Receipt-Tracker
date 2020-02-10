@@ -99,17 +99,16 @@ app.post("/remove", function(req, res) {
 });
 
 app.get("/modify", function(req, res) {
-  console.log("Code comes here");
   res.render("modify");
 });
 
 app.post("/modify", function(req, res) {
   if (typeof(req.body.check) === "string") {
     const oneItemId = req.body.check;
-    Receipt.findById(oneItemId, function(err, item){
-      if(err){
+    Receipt.findById(oneItemId, function(err, item) {
+      if (err) {
         console.log(err);
-      }else{
+      } else {
         console.log("The item by id is : " + item);
         res.render("modify", {
           receiptList: [item]
@@ -124,8 +123,8 @@ app.post("/modify", function(req, res) {
 
     console.log(arrayItemId);
 
-    Receipt.find().where('_id').in(arrayItemId).exec(function(err, fullList){
-      if(err){
+    Receipt.find().where('_id').in(arrayItemId).exec(function(err, fullList) {
+      if (err) {
         console.log(err);
       } else {
         res.render("modify", {
@@ -144,8 +143,51 @@ app.post("/modify", function(req, res) {
   // res.render("modify");
 });
 
-app.post("/submitModified", function(req, res){
+//updates in the database the changed values
+app.post("/submitModified", function(req, res) {
   console.log(req.body);
+  let counter = 0;
+  console.log(typeof(req.body.idItem));
+  if (typeof(req.body.idItem) === "string") {
+    Receipt.findByIdAndUpdate({
+      _id: req.body.idItem
+    }, {
+      date: req.body.updatedDate,
+      storeName: req.body.updatedStoreName,
+      storeAddress: req.body.updatedStoreAddress,
+      itemName: req.body.updatedItem,
+      itemQuantity: req.body.updatedQuantity,
+      price: req.body.updatedPrice
+    }, function(err, result) {
+      if (err) {
+        console.log(err);
+      } else {
+        console.log(result);
+      }
+    });
+  } else {
+    req.body.idItem.forEach(id => {
+      Receipt.findByIdAndUpdate({
+        _id: id
+      }, {
+        date: req.body.updatedDate[counter],
+        storeName: req.body.updatedStoreName[counter],
+        storeAddress: req.body.updatedStoreAddress[counter],
+        itemName: req.body.updatedItem[counter],
+        itemQuantity: req.body.updatedQuantity[counter],
+        price: req.body.updatedPrice[counter]
+      }, function(err, result) {
+        if (err) {
+          console.log(err);
+        } else {
+          console.log(result);
+        }
+      });
+      counter++;
+    });
+  }
+
+  counter = 0;
   res.redirect("/");
 });
 

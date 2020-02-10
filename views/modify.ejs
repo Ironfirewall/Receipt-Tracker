@@ -16,7 +16,6 @@
     <table class="main-table">
       <thead>
         <tr>
-          <th class="checkbox-width">Select</th>
           <th>Date (Y-M-D)</th>
           <th>Store Name</th>
           <th>Store Address</th>
@@ -30,6 +29,7 @@
         <% receiptList.reverse().forEach(function(receipt){ %>
         <!-- <form class="" action="" method="post" id="checkedItems"> -->
         <tr>
+          <input type="hidden" name="idItem" value="<%= receipt._id %>">
           <td><input type="date" name="updatedDate" value="<%= receipt.date %>"></td>
           <td><input type="text" name="updatedStoreName" value="<%= receipt.storeName %>"></td>
           <td><input type="text" name="updatedStoreAddress" value="<%= receipt.storeAddress %>"></td>
