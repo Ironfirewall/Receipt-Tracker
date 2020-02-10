@@ -45,10 +45,12 @@ app.get("/", function(req, res) {
 });
 
 
+//display add page
 app.get("/add", function(req, res) {
   res.render("add");
 });
 
+//adds a new item to the receipt list
 app.post("/add", function(req, res) {
   const newItem = new Receipt({
     date: req.body.newDate,
@@ -69,10 +71,12 @@ app.post("/add", function(req, res) {
 
 });
 
+// display remove page
 app.get("/remove", function(req, res) {
   res.render("remove");
 });
 
+//deletes selected item(s)
 app.post("/remove", function(req, res) {
   if (typeof(req.body.check) === "string") {
     const oneItemId = req.body.check;
@@ -98,10 +102,12 @@ app.post("/remove", function(req, res) {
   res.redirect("/");
 });
 
+//displays the modify page
 app.get("/modify", function(req, res) {
   res.render("modify");
 });
 
+//modify selected item(s)
 app.post("/modify", function(req, res) {
   if (typeof(req.body.check) === "string") {
     const oneItemId = req.body.check;
@@ -115,9 +121,6 @@ app.post("/modify", function(req, res) {
         });
       }
     });
-    // res.render("modify", {
-    //   itemId: oneItemId
-    // });
   } else if (typeof(req.body.check) === "object") {
     const arrayItemId = req.body.check;
 
@@ -132,15 +135,9 @@ app.post("/modify", function(req, res) {
         });
       }
     });
-
-    // res.render("modify", {
-    //   receiptList: arrayItemId
-    // });
   } else {
     res.redirect("/");
   }
-  // console.log(req.body);
-  // res.render("modify");
 });
 
 //updates in the database the changed values
@@ -186,10 +183,12 @@ app.post("/submitModified", function(req, res) {
       counter++;
     });
   }
-
   counter = 0;
   res.redirect("/");
 });
+
+//Here will go the RESTfull API
+
 
 app.listen(3000, function() {
   console.log("Server started on port 3000");
