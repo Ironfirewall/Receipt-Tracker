@@ -187,7 +187,114 @@ app.post("/submitModified", function(req, res) {
   res.redirect("/");
 });
 
+
+
+
 //Here will go the RESTfull API
+
+// get all items
+app.get("/rest", function(req, res) {
+  Receipt.find(function(err, foundItems) {
+    if (err) {
+      res.send(err);
+    } else {
+      res.send(foundItems);
+    }
+  });
+});
+
+// post an item to the database
+app.post("/rest", function(req, res) {
+  const newItem = new Receipt({
+    date: req.body.newDate,
+    storeName: req.body.newStore,
+    storeAddress: req.body.newAddress,
+    itemName: req.body.newItem,
+    itemQuantity: req.body.newQuantity,
+    price: req.body.newPrice
+  });
+  newItem.save(function(err) {
+    if (err) {
+      res.send(err);
+    } else {
+      res.send("Posted Successfully");
+    }
+  });
+});
+
+//delete all items
+app.delete("/rest", function(req, res) {
+  Receipt.deleteMany(function(err) {
+    if (err) {
+      res.send(err);
+    } else {
+      res.send("Deleted all items");
+    }
+  });
+});
+
+//get a specific item
+app.get("/rest/:itemName", function(req, res) {
+  Receipt.findOne({
+    itemName: req.params.itemName
+  }, function(err, singleItem) {
+    if (singleItem) {
+      res.send(singleItem);
+    } else {
+      res.send("Item not found");
+    }
+  });
+});
+
+//overwrite all fields of the item
+app.put("/rest/:itemName", function(req, res) {
+  Receipt.update({
+    itemName: req.params.itemName
+  }, {
+    date: req.body.newDate,
+    storeName: req.body.newStore,
+    storeAddress: req.body.newAddress,
+    itemName: req.body.newItem,
+    itemQuantity: req.body.newQuantity,
+    price: req.body.newPrice
+  }, {
+    overwrite: true
+  }, function(err) {
+    if (err) {
+      res.send(err);
+    } else {
+      res.send("Updated item");
+    }
+  });
+});
+
+//update some fields of the item
+app.patch("/rest/:itemName", function(req, res) {
+  Receipt.update({
+    itemName: req.params.itemName
+  }, {
+    $set: req.body
+  }, function(err) {
+    if (err) {
+      res.send(err);
+    } else {
+      res.send("Updated fields of the item");
+    }
+  });
+});
+
+//deletes single item
+app.delete("/rest/:itemName", function(req, res) {
+  Receipt.deleteOne({
+    itemName: req.params.itemName
+  }, function(err) {
+    if (err) {
+      res.send(err);
+    } else {
+      res.send("Deleted single item");
+    }
+  });
+});
 
 
 app.listen(3000, function() {
