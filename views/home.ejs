@@ -8,7 +8,7 @@
   <% }); %>
   <% console.log("sorted array"); %>
   <% console.log(sortedArray[0].date); %>
-  <input type="text" id="graphItem" placeholder="Search for an item">
+  <input type="text" id="graphItem" placeholder="Search for an item" onkeyup="displayData(<%=JSON.stringify(sortedArray) %>)">
   <button id="graphButton" type="button" name="graph" onclick="displayData(<%=JSON.stringify(sortedArray) %>)">UpdateGraph</button>
   <canvas id="myChart" width="400" height="400"></canvas>
 </div>
@@ -82,112 +82,173 @@
     $("#myChart").remove();
     $("#graphButton").after(" <canvas id='myChart' width='400' height='400'></canvas> ");
     let nameOfTheItem = document.getElementById("graphItem").value;
+    if(nameOfTheItem != ""){
+      // console.log("Testing out receipts in a script");
+      // console.log(sortedArray[0]);
+      let dateArray = [];
+      let datasets = [];
+      const colors = [
+        'rgba(255,99,132,1)',
+        'rgba(54, 162, 235, 1)',
+        'rgba(255, 206, 86, 1)',
+        'rgba(75, 192, 192, 1)',
+        'rgba(153, 102, 255, 1)',
+        'rgba(255, 159, 64, 1)'
+      ];
+      const backColors = [
+        'rgba(255, 99, 132, 0.2)',
+        'rgba(54, 162, 235, 0.2)',
+        'rgba(255, 206, 86, 0.2)',
+        'rgba(75, 192, 192, 0.2)',
+        'rgba(153, 102, 255, 0.2)',
+        'rgba(255, 159, 64, 0.2)'
+      ];
 
-    console.log("Testing out receipts in a script");
-    console.log(sortedArray[0]);
-    let dateArray = [];
-    let datasets = [];
-    const colors = [
-      'rgba(255,99,132,1)',
-      'rgba(54, 162, 235, 1)',
-      'rgba(255, 206, 86, 1)',
-      'rgba(75, 192, 192, 1)',
-      'rgba(153, 102, 255, 1)',
-      'rgba(255, 159, 64, 1)'
-    ];
-    const backColors = [
-      'rgba(255, 99, 132, 0.2)',
-      'rgba(54, 162, 235, 0.2)',
-      'rgba(255, 206, 86, 0.2)',
-      'rgba(75, 192, 192, 0.2)',
-      'rgba(153, 102, 255, 0.2)',
-      'rgba(255, 159, 64, 0.2)'
-    ];
+      function newPlotData(label, data, borderColor, backgroundColor) {
+        this.label = label;
+        this.data = [];
+        this.borderColor = borderColor;
+        this.backgroundColor = backgroundColor;
+        this.fill = true;
+      }
 
-    function newPlotData(label, data, borderColor, backgroundColor) {
-      this.label = label;
-      this.data = [];
-      this.borderColor = borderColor;
-      this.backgroundColor = backgroundColor;
-      this.fill = true;
-    }
-
-    function getRandomInt(max) {
-      return Math.floor(Math.random() * Math.floor(max));
-    }
-    console.log("The color index should be");
-    console.log(getRandomInt(6));
-    filteredArray = sortedArray.filter(element => element.itemName.toLowerCase().includes(nameOfTheItem.toLowerCase()));
-    console.log(filteredArray);
-    filteredArray.forEach(element => {
-      dateArray.push(new Date(element.date).toLocaleDateString());
-      if (datasets.length === 0) {
-        console.log("the first element is");
-        console.log(element);
-        let plotData = new newPlotData();
-        plotData.label = element.storeName;
-        let currentColor = getRandomInt(6);
-        plotData.borderColor = colors[currentColor];
-        plotData.backgroundColor = backColors[currentColor];
-        plotData.data.push({
-          x: new Date(element.date).toLocaleDateString(),
-          y: element.price
+      function getRandomInt(max) {
+        return Math.floor(Math.random() * Math.floor(max));
+      }
+      filteredArray = sortedArray.filter(element => element.storeName.toLowerCase().includes(nameOfTheItem.toLowerCase()));
+      if(filteredArray.length != 0){
+        console.log("it is a store name");
+        filteredArray.forEach(element => {
+          dateArray.push(new Date(element.date).toLocaleDateString());
+          if(datasets.length === 0){
+            let plotData = new newPlotData();
+            plotData.label = element.storeName;
+            let currentColor = getRandomInt(6);
+            plotData.borderColor = colors[currentColor];
+            plotData.backgroundColor = backColors[currentColor];
+            plotData.data.push({
+              x: new Date(element.date).toLocaleDateString(),
+              y: element.price
+            });
+            datasets.push(plotData);
+            console.log("is it pushse");
+            console.log(datasets);
+          } else {
+            console.log(new Date(element.date).toLocaleDateString());
+            console.log("searchbing in the dataset");
+            console.log(datasets[0].data.find(e => e.x ===new Date(element.date).toLocaleDateString()));
+            console.log("updated datasets");
+            console.log(datasets);
+            let foundPreviousDate = datasets[0].data.find(e => e.x ===new Date(element.date).toLocaleDateString());
+            console.log("priouc date");
+            console.log(foundPreviousDate);
+            if(foundPreviousDate === undefined){
+              console.log("same date: first current date, second date in db");
+              console.log(new Date(element.date).toLocaleDateString());
+              datasets[0].data.push({
+                x: new Date(element.date).toLocaleDateString(),
+                y: element.price
+              });
+            } else {
+              foundPreviousDate.y = foundPreviousDate.y + element.price;
+            }
+          }
         });
-        datasets.push(plotData);
+        var ctx = document.getElementById('myChart').getContext('2d');
+        var myChart = new Chart(ctx, {
+          type: 'line',
+          data: {
+            labels: dateArray,
+            datasets: datasets
+          },
+          options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            title: {
+              display: true,
+              text: filteredArray[0].storeName
+            }
+          }
+        });
       } else {
-        let currentData = datasets.find(e => e.label === element.storeName);
-        console.log("currentDatas");
-        console.log(currentData);
-        if (currentData === undefined) {
-          console.log("is it undefined?");
-          console.log(element.storeName);
-          console.log(element.price);
-          let plotData = new newPlotData();
-          plotData.label = element.storeName;
-          let currentColor = getRandomInt(6);
-          plotData.borderColor = colors[currentColor];
-          plotData.backgroundColor = backColors[currentColor];
-          plotData.data.push({
-            x: new Date(element.date).toLocaleDateString(),
-            y: element.price
-          });
-          console.log("The other one should be different");
-          console.log(plotData);
-          datasets.push(plotData);
-        } else {
-          currentData.data.push({
-            x: new Date(element.date).toLocaleDateString(),
-            y: element.price
-          });
-        }
+        filteredArray = sortedArray.filter(element => element.itemName.toLowerCase().includes(nameOfTheItem.toLowerCase()));
+        console.log(filteredArray);
+        filteredArray.forEach(element => {
+          dateArray.push(new Date(element.date).toLocaleDateString());
+          if (datasets.length === 0) {
+            console.log("the first element is");
+            console.log(element);
+            let plotData = new newPlotData();
+            plotData.label = element.storeName;
+            let currentColor = getRandomInt(6);
+            plotData.borderColor = colors[currentColor];
+            plotData.backgroundColor = backColors[currentColor];
+            plotData.data.push({
+              x: new Date(element.date).toLocaleDateString(),
+              y: element.price
+            });
+            datasets.push(plotData);
+          } else {
+            let currentData = datasets.find(e => e.label === element.storeName);
+            console.log("currentDatas");
+            console.log(currentData);
+            if (currentData === undefined) {
+              // console.log("is it undefined?");
+              // console.log(element.storeName);
+              // console.log(element.price);
+              let plotData = new newPlotData();
+              plotData.label = element.storeName;
+              let currentColor = getRandomInt(6);
+              plotData.borderColor = colors[currentColor];
+              plotData.backgroundColor = backColors[currentColor];
+              plotData.data.push({
+                x: new Date(element.date).toLocaleDateString(),
+                y: element.price
+              });
+              // console.log("The other one should be different");
+              // console.log(plotData);
+              datasets.push(plotData);
+            } else {
+              currentData.data.push({
+                x: new Date(element.date).toLocaleDateString(),
+                y: element.price
+              });
+            }
+          }
+
+          //use array.find() for each element in filtered array try to organize by store name. If name is the same, add prices to price array
+        });
+        console.log("The datasets array consists of ");
+        console.log(datasets);
+
+        console.log("the array containing dates is:");
+        console.log(dateArray);
+
+
+
+        var ctx = document.getElementById('myChart').getContext('2d');
+        var myChart = new Chart(ctx, {
+          type: 'line',
+          data: {
+            labels: dateArray,
+            datasets: datasets
+          },
+          options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            title: {
+              display: true,
+              text: filteredArray[0].itemName
+            }
+          }
+        });
       }
 
-      //use array.find() for each element in filtered array try to organize by store name. If name is the same, add prices to price array
-    });
-    console.log("The datasets array consists of ");
-    console.log(datasets);
 
-    console.log("the array containing dates is:");
-    console.log(dateArray);
+    }
+    // window.myChart.update();
 
 
-
-    var ctx = document.getElementById('myChart').getContext('2d');
-    var myChart = new Chart(ctx, {
-      type: 'line',
-      data: {
-        labels: dateArray,
-        datasets: datasets
-      },
-      options: {
-        responsive: true,
-        maintainAspectRatio: false,
-        title: {
-          display: true,
-          text: filteredArray[0].itemName
-        }
-      }
-    });
 
   }
 </script>
