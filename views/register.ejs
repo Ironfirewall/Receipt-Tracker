@@ -1,29 +1,57 @@
-<%- include("partials/header") %>
-<div class="container mt-5">
-  <h1>Register</h1>
+<!DOCTYPE html>
+<html lang="en" dir="ltr">
 
-  <div class="row">
-    <div class="col-sm-8">
-      <div class="card">
-        <div class="card-body">
+<head>
+  <meta charset="utf-8">
+  <title>Receipt Tracker</title>
+  <!-- <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css"> -->
+  <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.4.1/css/bootstrap.min.css" integrity="sha384-Vkoo8x4CGsO3+Hhxv8T/Q5PaXtkKtu6ug5TOeNV6gBiFeWPGFN9MuhOf23Q9Ifjh" crossorigin="anonymous">
+  <link rel="stylesheet" href="/css/styles.css">
+  <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.4.1/jquery.min.js"></script>
+  <!-- Compiled and minified CSS -->
+    <!-- <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/materialize/1.0.0/css/materialize.min.css"> -->
 
-          <!-- Makes POST request to /register route -->
-          <form action="/register" method="POST">
-            <div class="form-group">
-              <label for="email">Email</label>
-              <input type="text" class="form-control" name="username">
-            </div>
-            <div class="form-group">
-              <label for="password">Password</label>
-              <input type="password" class="form-control" name="password">
-            </div>
-            <button type="submit" class="btn btn-dark">Register</button>
-          </form>
+    <!-- Compiled and minified JavaScript -->
+    <!-- <script src="https://cdnjs.cloudflare.com/ajax/libs/materialize/1.0.0/js/materialize.min.js"></script> -->
+</head>
+<body>
 
-        </div>
-      </div>
+  
+<script>
+  function matchingPasswords(){
+    if(document.getElementsByName("username")[0].value != ""){
+      if(document.getElementsByName("password")[0].value.length > 0 && document.getElementsByName("confirmPassword")[0].value.length>0){
+        if(document.getElementsByName("password")[0].value === document.getElementsByName("confirmPassword")[0].value){
+            document.getElementsByName("registration")[0].submit();
+        } else {
+          document.getElementById("notMatching").innerHTML="Passwords do not match";
+          document.getElementsByName("password")[0].value="";
+          document.getElementsByName("confirmPassword")[0].value="";
+        }
+      }
+    } else {
+      document.getElementById("noUsername").innerHTML="Please enter a username";
+    }
+  }
+</script>
+
+<div class="login-form">
+  <h1 class="login-text">Register</h1>
+  <form action="/register" method="POST" class="form-input" name="registration">
+    <div class="">
+      <label for="email">Email</label>
+      <input type="text" class="form-control" name="username" placeholder="Username">
+      <p id="noUsername" style="color:red;"></p>
     </div>
-  </div>
+    <div class="">
+      <label for="password">Password</label>
+      <input type="password" class="form-control" name="password" placeholder="Password">
+      <input type="password" class="form-control" name="confirmPassword" placeholder="Confirm Password" style="margin-top:4%;">
+    </div>
+    <p id="notMatching" style="color:red;"></p>
+    <button type="button" class="btn btn-dark form-button register-button" onclick="matchingPasswords()">Register</button>
+
+  </form>
 </div>
 
-<%- include("partials/header") %>
+<%- include("partials/footer") %>

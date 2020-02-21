@@ -27,6 +27,46 @@ body {
   color: #1abc9c !important;
 }
 
+
+/*///////////////////////////////////////////// CSS for Login and Register Forms/////////////////////////////////////////////*/
+
+.login-form{
+  width: 20%;
+  margin: auto;
+  background-color: white;
+  border-radius: 8px;
+  box-shadow: 0 10px 20px rgba(0,0,0,0.19), 0 6px 6px rgba(0,0,0,0.23);
+  margin-top: 10%;
+}
+
+.login-text{
+  text-align: center;
+}
+
+.form-input{
+  width: 80%;
+  margin: auto;
+}
+
+.form-buttons{
+  text-align: center;
+  margin: 10px 10px;
+}
+
+.form-button{
+  width: 100%;
+  margin-top: 4%;
+}
+
+.register-button{
+  margin: 8% 0 8%;
+}
+
+.register-password{
+  margin-bottom: 6%;
+}
+
+
 /*///////////////////////////////////////////// CSS for footer /////////////////////////////////////////////*/
 
 .footer-padding {
@@ -58,6 +98,20 @@ body {
   margin-top: 18px;
 }
 
+
+/*///////////////////////////////////////////// Graph CSS /////////////////////////////////////////////*/
+
+.graph{
+  width: 80%;
+  margin: auto;
+  background-color: white;
+  border-radius: 8px;
+}
+
+.canvas{
+  width: 60% !important;
+  height: 60% !important;
+}
 
 /*///////////////////////////////////////////// Table CSS /////////////////////////////////////////////*/
 .main-table {
