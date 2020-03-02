@@ -1,0 +1,180 @@
+<%- include("partials/header"); -%>
+
+<script>
+
+  function chartLoad(mostStoreVisitedArray){
+    if(mostStoreVisitedArray !== ""){
+      labels =[];
+      data = [];
+      const mostStoreVisitedFrequency = mostStoreVisitedArray[1];
+      console.log("Most visited array");
+      console.log(mostStoreVisitedArray[1]);
+      if(mostStoreVisitedArray[0].length<6){
+        mostStoreVisitedArray[0].forEach(element => {
+          labels.push(element.storeName);
+        });
+      } else {
+        for (let index = 0; index < 5; index++) {
+          labels.push(mostStoreVisitedArray[0][index].storeName);
+        }
+      }
+      console.log(labels)
+      configStore.data.labels=labels;
+      labels.forEach(element => {
+        data.push(mostStoreVisitedFrequency[element]);
+        // console.log(element);
+      });
+      console.log(data);
+      configStore.data.datasets[0].data=data;
+      window.store.update();
+    }
+
+  }
+
+  function barLoad(mostItemBoughtArray){
+    if(mostItemBoughtArray !== ""){
+      labels = [];
+      data = [];
+      const mostItemBoughtFrequency = mostItemBoughtArray[1];
+      console.log("inside barLoad");
+      console.log(mostItemBoughtFrequency);
+      if(mostItemBoughtArray[0].length<6){
+        mostItemBoughtArray[0].forEach(element => {
+          labels.push(element.itemName);
+        });
+      } else {
+        for (let index = 0; index < 5; index++) {
+          labels.push(mostItemBoughtArray[0][index].itemName);
+        }
+      }
+      console.log(labels);
+      configItem.data.labels=labels;
+      labels.forEach(element => {
+        data.push(mostItemBoughtFrequency[element]);
+      });
+      console.log(mostItemBoughtFrequency);
+      configItem.data.datasets[0].data=data;
+      window.item.update();
+    }
+  }
+
+  let configStore = {
+    type: 'pie',
+    data: {
+      labels: [],
+      datasets: [{
+        label: "Number of visits",
+        data: [],
+        backgroundColor: ["#3e95cd", "#8e5ea2","#3cba9f","#e8c3b9","#c45850"]
+      }]
+    },
+    options: {
+      responsive: true,
+      maintainAspectRatio: true,
+      title: {
+        display: true,
+        text: "Number of visits"
+      }
+    }
+  };
+
+  let configItem = {
+    type: 'bar',
+    data: {
+      labels: [],
+      datasets: [{
+        label: "Items bought",
+        data: [],
+        backgroundColor: ["#3e95cd", "#8e5ea2","#3cba9f","#e8c3b9","#c45850"]
+      }]
+    },
+    options: {
+      responsive: true,
+      maintainAspectRatio: true,
+      legend: {
+        display: false
+      },
+      title: {
+        display: true,
+        text: "Most items bought"
+      }
+    }
+  };
+
+  window.onload = function(){
+    var ctx = document.getElementById('store').getContext('2d');
+    var ctxx = document.getElementById('item').getContext('2d');
+    window.store = new Chart(ctx, configStore);
+    window.item = new Chart(ctxx, configItem);
+  };
+
+
+</script>
+
+
+<h1>profiles</h1>
+<div class="container-profile">
+  <div class="profile">
+    <h2>Profile:</h2>
+    <h4><%= username %></h4>
+    <h3 class="settings" >Settings</h3>
+    <button type="button" name="button" class="btn btn-primary btn-settings" onclick="window.location.href = '/';">Change password</button>
+  </div>
+
+  <div class="stats">
+    <div class="store-stats">
+      <h3>Store Stats</h3>
+      <% let storeArrayLength = 5; %>
+      <% let itemArrayLength = 5; %>
+      <% let stores = "store"; %>
+      <% let items = "item"; %>
+      <% let storeTitle = "Currently there are no stores"; %>
+      <% let storeInfo = "Currently there are no stores"; %>
+      <% let itemTitle = "Currently there are no items"; %>
+      <% let itemInfo = "Currently there are no items"; %>
+      <% if(mostStoreVisitedArray !== "" || mostItemBoughtArray !== ""){ %>
+        <% if(mostStoreVisitedArray[0].length > 1){ %>
+        <%   stores="stores"; %>
+        <% } %>
+        <% if(mostItemBoughtArray[0].length > 1){ %>
+        <% items = "items"; %>
+        <%  } %>
+        <% if(mostStoreVisitedArray[0].length < 6){ %>
+        <%   storeArrayLength = mostStoreVisitedArray[0].length; %>
+        <% } %>
+        <% if(mostItemBoughtArray[0].length<6){ %>
+        <% itemArrayLength = mostItemBoughtArray[0].length; %>
+        <% } %>
+        <% storeTitle = "Top " + storeArrayLength + " most visited stores"; %>
+        <% storeInfo = "Your most visited store is: " + mostStoreVisitedArray[0][0].storeName; %>
+        <% itemTitle = "Top " + itemArrayLength + " most purchased items"; %>
+        <% itemInfo = "Your most bought item is: " + mostItemBoughtArray[0][0].itemName; %>
+      <% } %>
+
+      <button id="storeButton" class="btn main-page-button btn-primary" type="button" name="graph" onclick="chartLoad(<%=JSON.stringify(mostStoreVisitedArray) %>)">StoreGraph</button>
+      <button id="itemButton" class="btn main-page-button btn-primary" type="button" name="graph" onclick="barLoad(<%=JSON.stringify(mostItemBoughtArray) %>)">ItemGraph</button>
+      <h3><%= storeTitle %></h3>
+      <p> <%= storeInfo %></p>
+
+      <canvas id="store" width="400" height="390"></canvas>
+    </div>
+    <div class="item-stats">
+      <h3>Item stats</h3>
+      <h3> <%= itemTitle %> </h3>
+      <p> <%= itemInfo %></p>
+      <canvas id="item" width="400" height="400"></canvas>
+    </div>
+  </div>
+</div>
+
+<script>
+  // document.getElementById("storeButton").click();
+  $(document).ready(function(){
+    setTimeout(function(){
+      document.getElementById("storeButton").click();
+      document.getElementById("itemButton").click();
+    }, 300);
+  });
+</script>
+
+<%- include("partials/footer"); -%>
