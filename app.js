@@ -2,10 +2,14 @@
 
 //importing libraries
 const express = require("express");
+const expressLayouts = require('express-ejs-layouts');
 const bodyParser = require("body-parser");
 const ejs = require("ejs");
+const flash = require('connect-flash');
 const _ = require("lodash");
+const LocalStrategy = require('passport-local').Strategy;
 const mongoose = require("mongoose");
+const bcrypt = require('bcryptjs');
 
 //libraries for user authentication
 const session = require("express-session");
@@ -181,8 +185,51 @@ app.post("/add", function(req, res) {
   } else {
     res.redirect("/login");
   }
+});
 
+function sortByFrequency(array, variable) {
+    var frequency = {};
 
+    array.forEach(function(value) { frequency[value[variable]] = 0; });
+    var uniques = array.filter(function(value) {
+        return ++frequency[value[variable]] == 1;
+    });
+    return [uniques.sort(function(a, b) {
+        return frequency[b[variable]] - frequency[a[variable]];
+    }), frequency];
+}
+
+//displays the profile page
+app.get("/profile", function(req, res){
+  if(req.isAuthenticated()){
+    let mostStoreVisitedArray = "";
+    let mostStoreVisitedFrequency = "";
+    let mostVisitedStore = "";
+    let mostItemBoughtArray = "";
+    let mostItemBoughtFrequency = "";
+    let mostItemBought = "";
+    if(req.user.itemList.length !== 0){
+      mostStoreVisitedArray = [].concat(req.user.itemList);
+      mostStoreVisitedArray = sortByFrequency(mostStoreVisitedArray, "storeName");
+      mostStoreVisitedFrequency = mostStoreVisitedArray[1];
+      mostVisitedStore = mostStoreVisitedFrequency[mostStoreVisitedArray[0].storeName];
+      mostItemBoughtArray = [].concat(req.user.itemList);
+      mostItemBoughtArray = sortByFrequency(mostItemBoughtArray, "itemName");
+      mostItemBoughtFrequency = mostItemBoughtArray[1];
+      mostItemBought = mostItemBoughtFrequency[mostItemBoughtArray[0].itemName];
+    }
+    res.render("profile", {
+      mostStoreVisitedArray: mostStoreVisitedArray,
+      mostStoreVisitedFrequency: mostStoreVisitedFrequency,
+      mostVisitedStore: mostVisitedStore,
+      mostItemBoughtArray: mostItemBoughtArray,
+      mostItemBoughtFrequency: mostItemBoughtFrequency,
+      mostItemBought: mostItemBought,
+      username: req.user.username
+    });
+  } else {
+    res.redirect("/login");
+  }
 });
 
 // display remove page

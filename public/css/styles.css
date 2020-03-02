@@ -14,8 +14,8 @@ body {
 }
 
 .navbar {
-  padding-top: 15px;
-  padding-bottom: 15px;
+  padding-top: 20px;
+  padding-bottom: 30px;
   border: 0;
   border-radius: 0;
   margin-bottom: 0;
@@ -25,6 +25,15 @@ body {
 
 .navbar-nav li a:hover {
   color: #1abc9c !important;
+}
+
+.nav-item {
+  padding: 0 15px;
+}
+
+.nav-link {
+  font-size: 1rem;
+  /* font-family: 'Montserrat-Light' , sans-serif; */
 }
 
 
@@ -79,12 +88,13 @@ body {
   bottom: 0;
   width: 100%;
   height: 60px;
-  background-color: #f8f9fa;
+  /* background-color: #f8f9fa; */
   background-image: none;
   background-repeat: repeat;
   background-attachment: scroll;
   background-position: 0% 0%;
-  position: fixed;
+  /* position: fixed; */
+  padding: 1% 15% 5%;
   margin-top: 80px;
 }
 
@@ -98,19 +108,54 @@ body {
   margin-top: 18px;
 }
 
+/*///////////////////////////////////////////// Collapsible CSS /////////////////////////////////////////////*/
+
+.collapsible {
+  background-color: #eee;
+  color: #444;
+  cursor: pointer;
+  padding: 18px;
+  width: 80%;
+  border: none;
+  /* text-align: left; */
+  margin:2% 10% 0;
+
+  text-align: center;
+  outline: none;
+  font-size: 15px;
+}
+
+.active, .collapsible:hover {
+  background-color: #ccc;
+}
+
+
 
 /*///////////////////////////////////////////// Graph CSS /////////////////////////////////////////////*/
 
 .graph{
   width: 80%;
   margin: auto;
+  margin-top: 28px;
   background-color: white;
   border-radius: 8px;
+  /* display: none;
+  overflow: hidden; */
+  box-shadow: 0 10px 20px rgba(0,0,0,0.19), 0 6px 6px rgba(0,0,0,0.23);
 }
 
 .canvas{
   width: 60% !important;
   height: 60% !important;
+}
+
+.search {
+  width: 20%;
+  font-size: 16px;
+  padding: 12px 20px 12px 40px;
+  border: 1px solid #ddd;
+  border-radius: 8px;
+  margin: 2% 0 0 2%;
 }
 
 /*///////////////////////////////////////////// Table CSS /////////////////////////////////////////////*/
@@ -217,4 +262,54 @@ color: white;
 
 .checkbox-width {
   column-width: 80px;
+}
+
+
+/*///////////////////////////////////////////// Add Page CSS /////////////////////////////////////////////*/
+
+.container-profile {
+  width: 80%;
+  border-radius: 8px;
+  background-color:	#E0E0E0;
+  margin: auto;
+  display: flex;
+  justify-content: space-around;
+  box-shadow: 0 10px 20px rgba(0,0,0,0.19), 0 6px 6px rgba(0,0,0,0.23);
+  height: 800px;
+}
+
+.profile {
+  background-color: white;
+  border-radius: 8px;
+  margin: 8px;
+  box-shadow: 0 10px 20px rgba(0,0,0,0.19), 0 6px 6px rgba(0,0,0,0.23);
+  padding: 18px;
+  width: 500px;
+}
+
+.settings {
+  margin-top: 28px;
+}
+
+.btn-settings {
+  margin-top: 12px;
+}
+
+.stats{
+  background-color: white;
+  border-radius: 8px;
+  margin: 8px;
+  box-shadow: 0 10px 20px rgba(0,0,0,0.19), 0 6px 6px rgba(0,0,0,0.23);
+  padding: 18px;
+  display: flex;
+}
+
+#storeButton {
+  visibility: hidden;
+  position: absolute;
+}
+
+#itemButton {
+  visibility: hidden;
+  position: absolute;
 }

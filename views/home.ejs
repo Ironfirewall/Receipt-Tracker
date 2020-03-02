@@ -1,15 +1,13 @@
 <%- include("partials/header"); -%>
 
+<!-- <button type="button" class="collapsible" name="button">Open Collapsible</button> -->
 <div class="graph">
-  <% console.log(receiptList) %>
   <% var sortedArray = receiptList.sort(function(date1, date2){ %>
   <%   let d1 = new Date(date1.date), d2 = new Date(date2.date); %>
   <%   return d1-d2; %>
   <% }); %>
-  <% console.log("sorted array"); %>
-  <% console.log(sortedArray[0].date); %>
-  <input type="text" id="graphItem" placeholder="Search for an item" onkeyup="displayData(<%=JSON.stringify(sortedArray) %>)">
-  <button id="graphButton" type="button" name="graph" onclick="displayData(<%=JSON.stringify(sortedArray) %>)">UpdateGraph</button>
+  <input type="text" id="graphItem" placeholder="Search for item or store name" class="search" onkeyup="displayData(<%=JSON.stringify(sortedArray) %>)">
+  <button id="graphButton" class="btn main-page-button btn-primary" type="button" name="graph" onclick="displayData(<%=JSON.stringify(sortedArray) %>)">UpdateGraph</button>
   <canvas id="myChart" width="400" height="400"></canvas>
 </div>
 
@@ -49,7 +47,7 @@
     console.log(checkId);
     console.log(listOfClickedCheckboxes);
     if (listOfClickedCheckboxes.includes(checkId)) {
-      listOfClickedCheckboxes = listOfClickedCheckboxes.filter(element => element != checkId);
+      listOfClickedCheckboxes = listOfClickedCheckboxes.filter(element => element !== checkId);
     } else {
       listOfClickedCheckboxes.push(checkId);
     }
@@ -113,7 +111,7 @@
       resetChart();
       window.myChart.update();
     }
-    if(nameOfTheItem != ""){
+    if(nameOfTheItem !== ""){
       let dateArray = [];
       let datasets = [];
       const colors = [
@@ -145,7 +143,7 @@
         return Math.floor(Math.random() * Math.floor(max));
       }
       filteredArray = sortedArray.filter(element => element.storeName.toLowerCase().includes(nameOfTheItem.toLowerCase()));
-      if(filteredArray.length != 0){
+      if(filteredArray.length !== 0){
         resetChart();
         config.options.title.text = "Total spend at that store";
         filteredArray.forEach(element => {
@@ -272,9 +270,6 @@
     </table>
   </div>
 </form>
-<button class="btn returnButton btn-primary" onclick="window.location.href = '/add';">Add an item</button>
-<br>
-<button class="btn returnButton btn-primary" onclick="window.location.href = '/remove';">Remove Items</button>
 
 
 <%- include("partials/footer"); -%>
