@@ -2,7 +2,7 @@
 
 //importing libraries
 const express = require("express");
-const expressLayouts = require('express-ejs-layouts');
+// const expressLayouts = require('express-ejs-layouts');
 const bodyParser = require("body-parser");
 const ejs = require("ejs");
 const flash = require('connect-flash');
@@ -14,38 +14,7 @@ const bcrypt = require('bcryptjs');
 //libraries for user authentication
 const session = require("express-session");
 const passport = require("passport");
-const passportLocalMongoose = require("passport-local-mongoose");
 
-
-//initializing app and using public directory for css
-const app = express();
-app.use(bodyParser.urlencoded({
-  extended: true
-}));
-app.use(express.static("public"));
-
-//using ejs for public and views directories containing ejs files
-app.set('view engine', 'ejs');
-
-//initialize sessions for authentication
-app.use(session({
-  secret: "Password required for authenticating receipt tracker app",
-  resave: false,
-  saveUninitialized: false
-}));
-
-//initialize passport and use it with session
-app.use(passport.initialize());
-app.use(passport.session());
-
-//connect to MongoDB and create database
-mongoose.connect("mongodb://localhost:27017/receiptDB", {
-  useNewUrlParser: true,
-  useUnifiedTopology: true
-});
-
-//remove a warning due to passportLocalMongoose
-mongoose.set("useCreateIndex", true);
 
 //structure of an object in the database receiptDB
 const receiptsSchema = {
@@ -59,45 +28,209 @@ const receiptsSchema = {
 
 //structure for new user
 const userSchema = new mongoose.Schema({
-  username: String,
-  password: String,
+  name: {
+    type: String,
+    required: true
+  },
+  email: {
+    type: String,
+    required: true
+  },
+  password: {
+    type: String,
+    required: true
+  },
+  date: {
+    type: String,
+    default: new Date()
+  },
   itemList: [receiptsSchema]
 });
-
-//adding passportLocalMongoose as a plugin
-userSchema.plugin(passportLocalMongoose);
 
 
 //create user model
 const User = mongoose.model("User", userSchema);
 
-//use to create cookies
-passport.use(User.createStrategy());
-passport.serializeUser(User.serializeUser());
-passport.deserializeUser(User.deserializeUser());
+    passport.use(
+        new LocalStrategy({ usernameField: 'email'}, (email, password, done) => {
+            // Match User
+            User.findOne({email: email})
+                .then(user => {
+                    if(!user){
+                        return done(null, false, {message: 'That email is not registered'});
+                    }
+                    //Match password
+                    bcrypt.compare(password, user.password, (err, isMatch) => {
+                        if(err) throw err;
+                        if(isMatch){
+                            return done(null, user);
+                        } else {
+                            console.log("This should be incorrect");
+                            return done(null, false, {message: 'Password incorrect'});
+                        }
+                    });
+                })
+                .catch(err => console.log(err));
+        })
+    );
+
+    passport.serializeUser((user, done) => {
+        done(null, user.id);
+      });
+
+      passport.deserializeUser((id, done) => {
+        User.findById(id, (err, user) => {
+          done(err, user);
+        });
+      });
+
 
 //create receipt model
 const Receipt = mongoose.model("Receipt", receiptsSchema);
 
-app.get("/register", function(req, res){
-  res.render("register");
+
+//initializing app and using public directory for css
+const app = express();
+app.use(bodyParser.urlencoded({
+  extended: true
+}));
+app.use(express.static("public"));
+
+//using ejs for public and views directories containing ejs files
+// app.use(expressLayouts);
+app.set('view engine', 'ejs');
+
+//initialize sessions for authentication
+app.use(session({
+  secret: "Password required for authenticating receipt tracker app",
+  resave: true,
+  saveUninitialized: true
+}));
+
+//initialize passport and use it with session
+app.use(passport.initialize());
+app.use(passport.session());
+
+//connect to MongoDB and create database
+mongoose.connect("mongodb://localhost:27017/receiptDB", {
+  useNewUrlParser: true,
+  useUnifiedTopology: true
 });
 
-app.post("/register", function(req, res){
-  User.register({username: req.body.username}, req.body.password, function(err, user){
-    if(err){
-      console.log(err);
-      res.redirect("/register");
-    } else {
-      passport.authenticate("local")(req, res, function(){
-        res.redirect("/");
-      });
+// Connect flash
+app.use(flash());
+
+//Global Vars
+app.use((req, res, next) => {
+  res.locals.success_msg = req.flash('success_msg');
+  res.locals.error_msg = req.flash('error_msg');
+  res.locals.error = req.flash('error');
+  next();
+});
+
+
+app.get("/login", function(req, res){
+  res.render("login");
+});
+
+// Register
+app.get('/register', function(req, res) {
+    res.render("register");
+});
+
+//Register Handle
+app.post('/register', function(req, res) {
+    const { name, email, password, password2} = req.body;
+    let errors = [];
+
+    //Check required fields
+    if(!name || !email || !password || !password2){
+        errors.push({msg: "Please fill in all the fields"});
     }
-  });
+
+    //Check password match
+    if(password !== password2){
+        errors.push({msg: "Passwords do not match"});
+    }
+
+    //Check pass length
+    if(password.length <6){
+        errors.push({msg: "Password should at least be 6 characters"});
+    }
+
+    if(errors.length > 0){
+        res.render("register", {
+            errors,
+            name,
+            email,
+            password,
+            password2
+        });
+    } else {
+        User.findOne({email: email})
+        .then(user => {
+            if(user){
+                //User exists
+                errors.push({msg: "Email is already registered"});
+                res.render("register", {
+                    errors,
+                    name,
+                    email,
+                    password,
+                    password2
+                });
+            } else {
+                const newUser = new User({
+                    name,
+                    email,
+                    password
+                });
+
+                //Hash password
+                bcrypt.genSalt(10, (error, salt) => bcrypt.hash(newUser.password, salt, (err, hash) => {
+                    if(err) throw err;
+                    //Set password to hashed
+                    newUser.password = hash;
+                    //Save new user
+                    newUser.save()
+                        .then(user => {
+                            req.flash('success_msg', 'You are now registered and can log in');
+                            res.redirect('/login');
+                        })
+                        .catch(err => console.log(err));
+                }));
+            }
+        });
+    }
 });
 
-app.get("/", function(req, res) {
-  if(req.isAuthenticated()){
+//Login Handle
+app.post('/login', function(req, res, next) {
+    passport.authenticate('local', {
+        successRedirect: '/',
+        failureRedirect: '/login',
+        failureFlash: true
+    })(req, res, next);
+});
+
+// Logout Handle
+app.get('/logout', function(req, res){
+    req.logout();
+    req.flash('success_msg', 'You are successfully logged out');
+    res.redirect('/login');
+});
+
+const ensureAuthenticated = function(req, res, next){
+        if(req.isAuthenticated()){
+            return next();
+        }
+        req.flash('error_msg', 'Please log in to view this page');
+        res.redirect('/login');
+    };
+
+
+app.get("/", ensureAuthenticated, function(req, res) {
+  console.log("entered the home page successfully");
     res.render("home", {
       receiptList: req.user.itemList
     });
@@ -107,38 +240,7 @@ app.get("/", function(req, res) {
     //     receiptList: foundReceipt
     //   });
     // });
-  } else {
-    res.redirect("/login");
-  }
 });
-
-app.get("/login", function(req, res){
-  res.render("login");
-});
-
-app.post("/login", function(req, res){
-  const user = new User({
-    username: req.body.username,
-    password: req.body.password
-  });
-  req.login(user, function(err){
-    if(err){
-      console.log(err);
-      res.redirect("/login");
-    } else {
-      passport.authenticate("local")(req, res, function(){
-        res.redirect("/");
-      });
-    }
-  });
-});
-
-app.get("/logout", function(req, res){
-  req.logout();
-  res.redirect("/");
-});
-
-
 
 
 
@@ -148,7 +250,7 @@ app.get("/logout", function(req, res){
 //display add page
 app.get("/add", function(req, res) {
   if(req.isAuthenticated()){
-    console.log(req.user.username);
+    console.log(req.user.name);
     res.render("add");
   } else {
     res.redirect("/login");

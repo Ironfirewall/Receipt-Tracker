@@ -16,42 +16,66 @@
 </head>
 <body>
 
-  
-<script>
-  function matchingPasswords(){
-    if(document.getElementsByName("username")[0].value != ""){
-      if(document.getElementsByName("password")[0].value.length > 0 && document.getElementsByName("confirmPassword")[0].value.length>0){
-        if(document.getElementsByName("password")[0].value === document.getElementsByName("confirmPassword")[0].value){
-            document.getElementsByName("registration")[0].submit();
-        } else {
-          document.getElementById("notMatching").innerHTML="Passwords do not match";
-          document.getElementsByName("password")[0].value="";
-          document.getElementsByName("confirmPassword")[0].value="";
-        }
-      }
-    } else {
-      document.getElementById("noUsername").innerHTML="Please enter a username";
-    }
-  }
-</script>
 
-<div class="login-form">
-  <h1 class="login-text">Register</h1>
-  <form action="/register" method="POST" class="form-input" name="registration">
-    <div class="">
-      <label for="email">Email</label>
-      <input type="text" class="form-control" name="username" placeholder="Username">
-      <p id="noUsername" style="color:red;"></p>
+  <div class="row mt-5">
+      <div class="col-md-6 m-auto">
+        <div class="card card-body">
+          <h1 class="text-center mb-3">
+            <i class="fas fa-user-plus"></i> Register
+          </h1>
+          <%- include("./partials/messages"); %>
+          <form action="/register" method="POST">
+            <div class="form-group">
+              <label for="name">Name</label>
+              <input
+                type="name"
+                id="name"
+                name="name"
+                class="form-control"
+                placeholder="Enter Name"
+                value="<%= typeof name != 'undefined' ? name : '' %>"
+              />
+            </div>
+            <div class="form-group">
+              <label for="email">Email</label>
+              <input
+                type="email"
+                id="email"
+                name="email"
+                class="form-control"
+                placeholder="Enter Email"
+                value="<%= typeof email != 'undefined' ? email : '' %>"
+              />
+            </div>
+            <div class="form-group">
+              <label for="password">Password</label>
+              <input
+                type="password"
+                id="password"
+                name="password"
+                class="form-control"
+                placeholder="Create Password"
+                value="<%= typeof password != 'undefined' ? password : '' %>"
+              />
+            </div>
+            <div class="form-group">
+              <label for="password2">Confirm Password</label>
+              <input
+                type="password"
+                id="password2"
+                name="password2"
+                class="form-control"
+                placeholder="Confirm Password"
+                value="<%= typeof password2 != 'undefined' ? password2 : '' %>"
+              />
+            </div>
+            <button type="submit" class="btn btn-primary btn-block">
+              Register
+            </button>
+          </form>
+          <p class="lead mt-4">Have An Account? <a href="/login">Login</a></p>
+        </div>
+      </div>
     </div>
-    <div class="">
-      <label for="password">Password</label>
-      <input type="password" class="form-control" name="password" placeholder="Password">
-      <input type="password" class="form-control" name="confirmPassword" placeholder="Confirm Password" style="margin-top:4%;">
-    </div>
-    <p id="notMatching" style="color:red;"></p>
-    <button type="button" class="btn btn-dark form-button register-button" onclick="matchingPasswords()">Register</button>
-
-  </form>
-</div>
 
 <%- include("partials/footer") %>

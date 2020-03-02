@@ -17,32 +17,42 @@
 
 <body>
 
-<script>
-  function isInputEmpty(){
-    if(document.getElementsByName("username")[0].value !="" && document.getElementsByName("password")[0].value != ""){
-      document.getElementsByName("login-form")[0].submit();
-    } else{
-      document.getElementsByName("username")[0].value="";
-      document.getElementsByName("password")[0].value="";
-    }
-  }
-</script>
 
 
-<div class="login-form">
-  <h1 class="login-text">Login</h1>
-  <form action="/login" method="POST" class="form-input" name="login-form">
-    <div class="">
-      <label for="email">Email</label>
-      <input type="text" class="form-control" name="username" placeholder="Username" style="margin-bottom: 5%;">
+
+  <div class="row mt-5">
+      <div class="col-md-6 m-auto">
+        <div class="card card-body">
+          <h1 class="text-center mb-3"><i class="fas fa-sign-in-alt"></i>  Login</h1>
+          <%- include("./partials/messages"); %>
+          <form action="/login" method="POST">
+            <div class="form-group">
+              <label for="email">Email</label>
+              <input
+                type="email"
+                id="email"
+                name="email"
+                class="form-control"
+                placeholder="Enter Email"
+              />
+            </div>
+            <div class="form-group">
+              <label for="password">Password</label>
+              <input
+                type="password"
+                id="password"
+                name="password"
+                class="form-control"
+                placeholder="Enter Password"
+              />
+            </div>
+            <button type="submit" class="btn btn-primary btn-block">Login</button>
+          </form>
+          <p class="lead mt-4">
+            No Account? <a href="/register">Register</a>
+          </p>
+        </div>
+      </div>
     </div>
-    <div class="">
-      <label for="password">Password</label>
-      <input type="password" class="form-control" name="password" placeholder="Password">
-    </div>
-    <button type="button" class="btn btn-dark form-button" style="margin-top: 8%;" onclick="isInputEmpty()">Login</button>
-    <button type="button" class="btn btn-dark form-button" style="margin-bottom: 6%;" onclick="window.location.href = '/register';">Register</button>
-  </form>
-</div>
 
 <%- include("partials/footer") %>
