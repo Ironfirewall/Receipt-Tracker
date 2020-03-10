@@ -42,7 +42,7 @@ const userSchema = new mongoose.Schema({
   },
   date: {
     type: String,
-    default: new Date()
+    default: new Date().toDateString()
   },
   itemList: [receiptsSchema]
 });
@@ -65,7 +65,6 @@ const User = mongoose.model("User", userSchema);
                         if(isMatch){
                             return done(null, user);
                         } else {
-                            console.log("This should be incorrect");
                             return done(null, false, {message: 'Password incorrect'});
                         }
                     });
@@ -230,7 +229,6 @@ const ensureAuthenticated = function(req, res, next){
 
 
 app.get("/", ensureAuthenticated, function(req, res) {
-  console.log("entered the home page successfully");
     res.render("home", {
       receiptList: req.user.itemList
     });
@@ -304,6 +302,7 @@ function sortByFrequency(array, variable) {
 //displays the profile page
 app.get("/profile", function(req, res){
   if(req.isAuthenticated()){
+    let errors = [];
     let mostStoreVisitedArray = "";
     let mostStoreVisitedFrequency = "";
     let mostVisitedStore = "";
@@ -327,12 +326,93 @@ app.get("/profile", function(req, res){
       mostItemBoughtArray: mostItemBoughtArray,
       mostItemBoughtFrequency: mostItemBoughtFrequency,
       mostItemBought: mostItemBought,
-      username: req.user.username
+      username: req.user.name,
+      registeredDate: req.user.date,
+      email: req.user.email,
+      errors: errors
     });
   } else {
     res.redirect("/login");
   }
 });
+
+app.post("/updateProfile", function(req, res) {
+  if (req.isAuthenticated()) {
+    let errors = [];
+    if (req.body.name !== "") {
+      req.user.name = req.body.name;
+    }
+    if (req.body.password.length < 6 && req.body.password.length !== 0) {
+      errors.push({
+        msg: "Password should at least be 6 characters"
+      });
+    }
+    User.findOne({
+      email: req.body.email
+    }, function(err, foundEmail) {
+      if (foundEmail) {
+        errors.push({
+          msg: "Email is already registered"
+        });
+      } else {
+        if(req.body.email.length !==0){
+          req.user.email = req.body.email;
+        }
+      }
+      if (errors.length > 0) {
+        let mostStoreVisitedArray = "";
+        let mostStoreVisitedFrequency = "";
+        let mostVisitedStore = "";
+        let mostItemBoughtArray = "";
+        let mostItemBoughtFrequency = "";
+        let mostItemBought = "";
+        if (req.user.itemList.length !== 0) {
+          mostStoreVisitedArray = [].concat(req.user.itemList);
+          mostStoreVisitedArray = sortByFrequency(mostStoreVisitedArray, "storeName");
+          mostStoreVisitedFrequency = mostStoreVisitedArray[1];
+          mostVisitedStore = mostStoreVisitedFrequency[mostStoreVisitedArray[0].storeName];
+          mostItemBoughtArray = [].concat(req.user.itemList);
+          mostItemBoughtArray = sortByFrequency(mostItemBoughtArray, "itemName");
+          mostItemBoughtFrequency = mostItemBoughtArray[1];
+          mostItemBought = mostItemBoughtFrequency[mostItemBoughtArray[0].itemName];
+        }
+        res.render("profile", {
+          mostStoreVisitedArray: mostStoreVisitedArray,
+          mostStoreVisitedFrequency: mostStoreVisitedFrequency,
+          mostVisitedStore: mostVisitedStore,
+          mostItemBoughtArray: mostItemBoughtArray,
+          mostItemBoughtFrequency: mostItemBoughtFrequency,
+          mostItemBought: mostItemBought,
+          username: req.user.name,
+          registeredDate: req.user.date,
+          email: req.user.email,
+          errors: errors
+        });
+      } else {
+        if(req.body.password.length !== 0){
+          bcrypt.genSalt(10, (error, salt) => bcrypt.hash(req.body.password, salt, (err, hash) => {
+            if(err) throw err;
+            req.user.password = hash;
+            req.user.save().then(user => {
+              req.flash('success_msg', 'Successfully updated profile');
+              res.redirect('/profile');
+            });
+          }));
+        } else {
+          req.user.save().then(user => {
+            req.flash('success_msg', 'Successfully updated profile');
+            res.redirect('/profile');
+          });
+        }
+      }
+    });
+  } else {
+    res.redirect("/login");
+  }
+});
+
+
+
 
 // display remove page
 app.get("/remove", function(req, res) {

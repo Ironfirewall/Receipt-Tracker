@@ -40,7 +40,7 @@ body {
 /*///////////////////////////////////////////// CSS for Login and Register Forms/////////////////////////////////////////////*/
 
 .login-form{
-  width: 20%;
+  width: 40%;
   margin: auto;
   background-color: white;
   border-radius: 8px;
@@ -265,13 +265,13 @@ color: white;
 }
 
 
-/*///////////////////////////////////////////// Add Page CSS /////////////////////////////////////////////*/
+/*///////////////////////////////////////////// Profile Page CSS /////////////////////////////////////////////*/
 
 .container-profile {
   width: 80%;
   border-radius: 8px;
   background-color:	#E0E0E0;
-  margin: auto;
+  margin: 60px auto 0;
   display: flex;
   justify-content: space-around;
   box-shadow: 0 10px 20px rgba(0,0,0,0.19), 0 6px 6px rgba(0,0,0,0.23);
@@ -285,6 +285,14 @@ color: white;
   box-shadow: 0 10px 20px rgba(0,0,0,0.19), 0 6px 6px rgba(0,0,0,0.23);
   padding: 18px;
   width: 500px;
+}
+
+.settings-form {
+  margin-top: 14px;
+}
+
+.settings-input {
+  margin-bottom: 12px;
 }
 
 .settings {

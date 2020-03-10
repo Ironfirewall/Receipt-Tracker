@@ -108,17 +108,72 @@
     window.item = new Chart(ctxx, configItem);
   };
 
+var enable = false;
+
+function toggleEnable() {
+  if(!enable){
+    document.getElementById("email").disabled = false;
+    document.getElementById("name").disabled = false;
+    document.getElementById("password").disabled = false;
+    document.getElementById("submitChanges").disabled = false;
+    enable = true;
+  } else {
+    document.getElementById("email").disabled = true;
+    document.getElementById("name").disabled = true;
+    document.getElementById("password").disabled = true;
+    document.getElementById("submitChanges").disabled = true;
+    enable = false;
+  }
+}
 
 </script>
 
 
-<h1>profiles</h1>
+
 <div class="container-profile">
   <div class="profile">
-    <h2>Profile:</h2>
-    <h4><%= username %></h4>
+    <h2><%= username %>'s profile:</h2>
+    <p>Member since: <%= registeredDate %></p>
+    <p>Current email: <%= email %> </p>
     <h3 class="settings" >Settings</h3>
-    <button type="button" name="button" class="btn btn-primary btn-settings" onclick="window.location.href = '/';">Change password</button>
+    <button type="button" name="button" class="btn btn-primary btn-settings" onclick="toggleEnable();">Edit Profile</button>
+    <div class="settings-form">
+      <%- include("./partials/messages"); %>
+      <form action="/updateProfile" method="POST">
+      <label for="name">Current Profile Name</label>
+      <input
+        type="name"
+        id="name"
+        name="name"
+        class="form-control settings-input"
+        placeholder= <%= username %>
+        value="<%= typeof name != 'undefined' ? name : '' %>"
+        disabled
+      />
+      <label for="email">Update Email</label>
+      <input
+        type="email"
+        id="email"
+        name="email"
+        class="form-control settings-input"
+        placeholder= "newEmail@example.com"
+        value=""
+        disabled
+      />
+      <label for="password">Password</label>
+      <input
+        type="password"
+        id="password"
+        name="password"
+        class="form-control settings-input"
+        placeholder="Enter New Password"
+        value="<%= typeof password != 'undefined' ? password : '' %>"
+        disabled
+      />
+      <button type="submit" name="button" class="btn btn-primary btn-settings" id="submitChanges" disabled >Submit Changes</button>
+      </form>
+    </div>
+
   </div>
 
   <div class="stats">
