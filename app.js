@@ -339,6 +339,41 @@ app.get("/profile", function(req, res){
 app.post("/updateProfile", function(req, res) {
   if (req.isAuthenticated()) {
     let errors = [];
+    if(req.body.name.length === 0 && req.body.password.length === 0 && req.body.email.length === 0){
+      errors.push({
+        msg: "No changes have been made"
+      });
+      if (errors.length > 0) {
+        let mostStoreVisitedArray = "";
+        let mostStoreVisitedFrequency = "";
+        let mostVisitedStore = "";
+        let mostItemBoughtArray = "";
+        let mostItemBoughtFrequency = "";
+        let mostItemBought = "";
+        if (req.user.itemList.length !== 0) {
+          mostStoreVisitedArray = [].concat(req.user.itemList);
+          mostStoreVisitedArray = sortByFrequency(mostStoreVisitedArray, "storeName");
+          mostStoreVisitedFrequency = mostStoreVisitedArray[1];
+          mostVisitedStore = mostStoreVisitedFrequency[mostStoreVisitedArray[0].storeName];
+          mostItemBoughtArray = [].concat(req.user.itemList);
+          mostItemBoughtArray = sortByFrequency(mostItemBoughtArray, "itemName");
+          mostItemBoughtFrequency = mostItemBoughtArray[1];
+          mostItemBought = mostItemBoughtFrequency[mostItemBoughtArray[0].itemName];
+        }
+        res.render("profile", {
+          mostStoreVisitedArray: mostStoreVisitedArray,
+          mostStoreVisitedFrequency: mostStoreVisitedFrequency,
+          mostVisitedStore: mostVisitedStore,
+          mostItemBoughtArray: mostItemBoughtArray,
+          mostItemBoughtFrequency: mostItemBoughtFrequency,
+          mostItemBought: mostItemBought,
+          username: req.user.name,
+          registeredDate: req.user.date,
+          email: req.user.email,
+          errors: errors
+        });
+      }
+    } else {
     if (req.body.name !== "") {
       req.user.name = req.body.name;
     }
@@ -406,6 +441,7 @@ app.post("/updateProfile", function(req, res) {
         }
       }
     });
+    }
   } else {
     res.redirect("/login");
   }

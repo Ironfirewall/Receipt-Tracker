@@ -6,7 +6,8 @@
   <%   let d1 = new Date(date1.date), d2 = new Date(date2.date); %>
   <%   return d1-d2; %>
   <% }); %>
-  <input type="text" id="graphItem" placeholder="Search for item or store name" class="search" onkeyup="displayData(<%=JSON.stringify(sortedArray) %>)">
+  <input type="text" id="graphItem" placeholder="Search for item or store name" class="search">
+  <!-- onkeyup="displayData( JSON.stringify(sortedArray) )" -->
   <button id="graphButton" class="btn main-page-button btn-primary" type="button" name="graph" onclick="displayData(<%=JSON.stringify(sortedArray) %>)">UpdateGraph</button>
   <canvas id="myChart" width="400" height="400"></canvas>
 </div>
@@ -114,6 +115,7 @@
     if(nameOfTheItem !== ""){
       let dateArray = [];
       let datasets = [];
+      let colorCounter = 0;
       const colors = [
         'rgba(255,99,132,1)',
         'rgba(54, 162, 235, 1)',
@@ -139,9 +141,6 @@
         this.fill = true;
       }
 
-      function getRandomInt(max) {
-        return Math.floor(Math.random() * Math.floor(max));
-      }
       filteredArray = sortedArray.filter(element => element.storeName.toLowerCase().includes(nameOfTheItem.toLowerCase()));
       if(filteredArray.length !== 0){
         resetChart();
@@ -151,9 +150,9 @@
           if(config.data.datasets.length === 0){
             let plotData = new newPlotData();
             plotData.label = element.storeName;
-            let currentColor = getRandomInt(6);
-            plotData.borderColor = colors[currentColor];
-            plotData.backgroundColor = backColors[currentColor];
+            plotData.borderColor = colors[colorCounter%6];
+            plotData.backgroundColor = backColors[colorCounter%6];
+            colorCounter++;
             plotData.data.push({
               x: new Date(element.date).toLocaleDateString(),
               y: element.price
@@ -182,9 +181,9 @@
           if (config.data.datasets.length === 0) {
             let plotData = new newPlotData();
             plotData.label = element.storeName;
-            let currentColor = getRandomInt(6);
-            plotData.borderColor = colors[currentColor];
-            plotData.backgroundColor = backColors[currentColor];
+            plotData.borderColor = colors[colorCounter%6];
+            plotData.backgroundColor = backColors[colorCounter%6];
+            colorCounter++;
             plotData.data.push({
               x: new Date(element.date).toLocaleDateString(),
               y: element.price
@@ -195,9 +194,9 @@
             if (currentData === undefined) {
               let plotData = new newPlotData();
               plotData.label = element.storeName;
-              let currentColor = getRandomInt(6);
-              plotData.borderColor = colors[currentColor];
-              plotData.backgroundColor = backColors[currentColor];
+              plotData.borderColor = colors[colorCounter%6];
+              plotData.backgroundColor = backColors[colorCounter%6];
+              colorCounter++;
               plotData.data.push({
                 x: new Date(element.date).toLocaleDateString(),
                 y: element.price
